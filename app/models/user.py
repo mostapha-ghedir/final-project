@@ -82,3 +82,26 @@ class User(UserMixin):
     
     def is_favorite(self, book_id):
         return str(book_id) in self.get_favorites()
+    
+    def update_password(self, new_password):
+        password_hash = generate_password_hash(new_password)
+        mongo.db.users.update_one(
+            {'_id': ObjectId(self.id)},
+            {'$set': {'password_hash': password_hash}}
+        )
+        self.password_hash = password_hash
+    
+    def update_profile(self, username=None, email=None):
+        update_data = {}
+        if username:
+            update_data['username'] = username
+            self.username = username
+        if email:
+            update_data['email'] = email
+            self.email = email
+        
+        if update_data:
+            mongo.db.users.update_one(
+                {'_id': ObjectId(self.id)},
+                {'$set': update_data}
+            )

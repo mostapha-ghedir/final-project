@@ -93,3 +93,51 @@ def api_stats():
         'genres': genres,
         'user_roles': roles
     })
+
+@bp.route('/profile')
+@login_required
+@admin_required
+def profile():
+    return render_template('admin_profile.html')
+
+@bp.route('/profile/update', methods=['POST'])
+@login_required
+@admin_required
+def update_profile():
+    username = request.form.get('username')
+    email = request.form.get('email')
+    
+    # Check if username already exists (excluding current user)
+    if username and username != current_user.username:
+        existing_user = User.get_by_username(username)
+        if existing_user:
+            flash('Username already exists', 'error')
+            return redirect(url_for('admin.profile'))
+    
+    current_user.update_profile(username, email)
+    flash('Profile updated successfully', 'success')
+    return redirect(url_for('admin.profile'))
+
+@bp.route('/profile/change-password', methods=['POST'])
+@login_required
+@admin_required
+def change_password():
+    current_password = request.form.get('current_password')
+    new_password = request.form.get('new_password')
+    confirm_password = request.form.get('confirm_password')
+    
+    if not current_user.check_password(current_password):
+        flash('Current password is incorrect', 'error')
+        return redirect(url_for('admin.profile'))
+    
+    if new_password != confirm_password:
+        flash('New passwords do not match', 'error')
+        return redirect(url_for('admin.profile'))
+    
+    if len(new_password) < 6:
+        flash('Password must be at least 6 characters long', 'error')
+        return redirect(url_for('admin.profile'))
+    
+    current_user.update_password(new_password)
+    flash('Password changed successfully', 'success')
+    return redirect(url_for('admin.profile'))
