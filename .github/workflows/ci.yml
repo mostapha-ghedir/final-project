@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, backend-core, api-routes, frontend-templates, devops-testing ]
+    branches: [ main, backend-core, api-routes, frontend-templates ]
   pull_request:
     branches: [ main ]
 
