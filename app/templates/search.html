@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Search Books{% endblock %}
+
+{% block content %}
+<h2>Search Books</h2>
+<form method="post" class="mb-4">
+    <div class="input-group">
+        <input type="text" class="form-control" name="query" placeholder="Search by title or author" value="{{ query }}" required>
+        <button class="btn btn-outline-secondary" type="submit">Search</button>
+    </div>
+</form>
+{% if books %}
+    <h3>Results</h3>
+    <div class="row">
+        {% for book in books %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ book.title }}</h5>
+                    <p class="card-text">By {{ book.author }}</p>
+                    <a href="{{ url_for('books.book_detail', book_id=book._id) }}" class="btn btn-info">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

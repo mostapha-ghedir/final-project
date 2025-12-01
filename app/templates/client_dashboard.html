@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}My Library - Book Library{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-gradient-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2>Welcome back, {{ current_user.username }}!</h2>
+                            <p class="mb-0">Discover your next favorite book</p>
+                        </div>
+                        <div class="btn-group">
+                            <a href="{{ url_for('client.browse_books') }}" class="btn btn-light">Browse Books</a>
+                            <a href="{{ url_for('client.favorites') }}" class="btn btn-outline-light">
+                                <i class="fas fa-heart"></i> Favorites
+                            </a>
+                            <a href="{{ url_for('client.profile') }}" class="btn btn-outline-light">Profile</a>
+                            <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="fas fa-search fa-3x text-primary mb-3"></i>
+                    <h5>Search Books</h5>
+                    <p class="text-muted">Find books by title or author</p>
+                    <a href="{{ url_for('books.search_books') }}" class="btn btn-primary">Search</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="fas fa-list fa-3x text-success mb-3"></i>
+                    <h5>Browse All</h5>
+                    <p class="text-muted">View complete book collection</p>
+                    <a href="{{ url_for('client.browse_books') }}" class="btn btn-success">Browse</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="fas fa-tags fa-3x text-warning mb-3"></i>
+                    <h5>By Genre</h5>
+                    <p class="text-muted">Explore books by category</p>
+                    <a href="{{ url_for('client.browse_books') }}?genre=" class="btn btn-warning">Genres</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="fas fa-user fa-3x text-info mb-3"></i>
+                    <h5>My Profile</h5>
+                    <p class="text-muted">Manage your account</p>
+                    <a href="{{ url_for('client.profile') }}" class="btn btn-info">Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Books -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recently Added Books</h5>
+                    <a href="{{ url_for('client.browse_books') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if books %}
+                        <div class="row">
+                            {% for book in books %}
+                            <div class="col-md-4 col-lg-2 mb-4">
+                                <div class="card h-100 book-card">
+                                    {% if book.image %}
+                                        <img src="{{ url_for('static', filename='uploads/' + book.image) }}" 
+                                             class="card-img-top book-cover" alt="{{ book.title }}">
+                                    {% else %}
+                                        <div class="card-img-top book-placeholder d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-book fa-3x text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div class="card-body p-2">
+                                        <h6 class="card-title text-truncate" title="{{ book.title }}">{{ book.title }}</h6>
+                                        <p class="card-text text-muted small text-truncate">{{ book.author }}</p>
+                                        <p class="card-text text-muted small">{{ book.year }}</p>
+                                    </div>
+                                    <div class="card-footer p-2">
+                                        <a href="{{ url_for('client.book_detail', book_id=book._id) }}" 
+                                           class="btn btn-sm btn-primary w-100">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-book-open fa-4x text-muted mb-3"></i>
+                            <h4 class="text-muted">No books available yet</h4>
+                            <p class="text-muted">Check back later for new additions to our library!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.book-card {
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.book-cover {
+    height: 200px;
+    object-fit: cover;
+}
+
+.book-placeholder {
+    height: 200px;
+    background-color: #f8f9fa;
+}
+</style>
+{% endblock %}
