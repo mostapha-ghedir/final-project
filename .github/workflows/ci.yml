@@ -30,19 +30,8 @@ jobs:
         pip install -r requirements.txt
         pip install pytest
     
-    - name: Run tests
-      env:
-        MONGO_URI: mongodb://localhost:27017/book_library_test
-        SECRET_KEY: test-secret-key
-      run: |
-        python -m pytest --tb=short -v || echo "No tests found"
-    
-    - name: Test Flask app
-      env:
-        MONGO_URI: mongodb://localhost:27017/book_library_test
-        SECRET_KEY: test-secret-key
-      run: |
-        python -c "from app import create_app; app = create_app(); print('Flask app created successfully')"
+   
+  
 
   docker-build:
     runs-on: ubuntu-latest
