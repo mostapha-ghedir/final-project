@@ -64,9 +64,20 @@ def update_user_role(user_id):
 def delete_user(user_id):
     if user_id == current_user.id:
         flash('Cannot delete your own account', 'error')
-    else:
-        User.delete(user_id)
-        flash('User deleted successfully', 'success')
+        return redirect(url_for('admin.manage_users'))
+    
+    target_user = User.get_by_id(user_id)
+    if not target_user:
+        flash('User not found', 'error')
+        return redirect(url_for('admin.manage_users'))
+    
+    # Only super admin can delete admins
+    if target_user.is_admin() and not current_user.is_super_admin():
+        flash('Only super admin can delete admin users', 'error')
+        return redirect(url_for('admin.manage_users'))
+    
+    User.delete(user_id)
+    flash('User deleted successfully', 'success')
     return redirect(url_for('admin.manage_users'))
 
 @bp.route('/api/stats')

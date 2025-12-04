@@ -17,12 +17,12 @@ def create_admin_user():
             print("Admin user already exists!")
             return
         
-        # Create admin user
+        # Create super admin user
         admin_user = User.create(
             username='admin',
             email='admin@booklibrary.com',
             password='admin123',  # Change this password!
-            role='admin'
+            role='super_admin'
         )
         
         print("Admin user created successfully!")
