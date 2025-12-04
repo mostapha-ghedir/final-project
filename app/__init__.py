@@ -12,6 +12,15 @@ def create_app():
     
     mongo.init_app(app)
     
+    # Test MongoDB connection
+    with app.app_context():
+        try:
+            mongo.db.command('ping')
+            print(f"✓ Connected to MongoDB: {app.config['MONGO_URI']}")
+        except Exception as e:
+            print(f"✗ MongoDB connection failed: {e}")
+            print(f"MongoDB URI: {app.config['MONGO_URI']}")
+    
     # Initialize Flask-Login
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
@@ -22,6 +31,15 @@ def create_app():
     def load_user(user_id):
         from .models.user import User
         return User.get_by_id(user_id)
+    
+    # Health check route
+    @app.route('/health')
+    def health_check():
+        try:
+            mongo.db.command('ping')
+            return {'status': 'healthy', 'database': 'connected'}, 200
+        except Exception as e:
+            return {'status': 'unhealthy', 'database': 'disconnected', 'error': str(e)}, 500
     
     # Register blueprints
     from .routes import books, auth, admin, client, favorites

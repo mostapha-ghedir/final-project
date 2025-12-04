@@ -4,16 +4,19 @@ services:
   web:
     build: .
     ports:
-      - "5001:5001"
+      - "5001:5000"
     environment:
       - MONGO_URI=mongodb://mongo:27017/book_library
       - SECRET_KEY=your-production-secret-key-change-this
       - FLASK_ENV=production
     depends_on:
-      - mongo
+      mongo:
+        condition: service_started
     restart: unless-stopped
     volumes:
       - ./app/static/uploads:/app/app/static/uploads
+    networks:
+      - app-network
 
   mongo:
     image: mongo:7.0
@@ -22,6 +25,18 @@ services:
     volumes:
       - mongo_data:/data/db
     restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
 
 volumes:
   mongo_data:
+
+networks:
+  app-network:
+    driver: bridge
