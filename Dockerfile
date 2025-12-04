@@ -19,16 +19,17 @@ WORKDIR /app
 # -----------------------------
 # 4. Install Python Dependencies
 # -----------------------------
-# Copy only requirements first (layer caching optimization)
 COPY requirements.txt .
-
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # -----------------------------
 # 5. Copy Application Code
 # -----------------------------
-COPY . .
+# نسخ run.py أولًا لأنه خارج app
+COPY run.py .
+# نسخ مجلد app كامل
+COPY app ./app
 
 # Ensure uploads directory exists
 RUN mkdir -p app/static/uploads
