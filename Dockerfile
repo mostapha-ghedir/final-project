@@ -1,31 +1,59 @@
-FROM python:3.11-slim
+# -----------------------------
+# 1. Base Image (slim + security)
+# -----------------------------
+FROM python:3.11-slim AS base
 
-WORKDIR /app
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# -----------------------------
+# 2. Security Updates & Packages
+# -----------------------------
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
+# -----------------------------
+# 3. Create App Directory
+# -----------------------------
+WORKDIR /app
+
+# -----------------------------
+# 4. Install Python Dependencies
+# -----------------------------
+# Copy only requirements first (layer caching optimization)
 COPY requirements.txt .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# -----------------------------
+# 5. Copy Application Code
+# -----------------------------
 COPY . .
 
-# Create uploads directory
+# Ensure uploads directory exists
 RUN mkdir -p app/static/uploads
 
-# Set environment variables
-ENV FLASK_APP=run.py
-ENV FLASK_ENV=production
-ENV PYTHONPATH=/app
+# -----------------------------
+# 6. Set Environment Variables
+# -----------------------------
+ENV PYTHONUNBUFFERED=1 \
+    FLASK_APP=run.py \
+    FLASK_ENV=production \
+    PYTHONPATH=/app \
+    PORT=5001
 
-# Expose port
+# -----------------------------
+# 7. Non-root User (Security)
+# -----------------------------
+RUN adduser --disabled-password --gecos "" appuser
+USER appuser
+
+# -----------------------------
+# 8. Expose Port
+# -----------------------------
 EXPOSE 5001
 
-# Run the application
+# -----------------------------
+# 9. Run the Application
+# -----------------------------
 CMD ["python", "run.py"]
