@@ -82,15 +82,19 @@
                                             {% if user.id != current_user.id %}
                                                 <div class="btn-group" role="group">
                                                     <!-- Role Change Form -->
-                                                    <form method="POST" action="{{ url_for('admin.update_user_role', user_id=user.id) }}" class="d-inline">
-                                                        <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
-                                                            <option value="client" {% if user.role == 'client' %}selected{% endif %}>Client</option>
-                                                            <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
-                                                            {% if current_user.is_super_admin() %}
-                                                                <option value="super_admin" {% if user.role == 'super_admin' %}selected{% endif %}>Super Admin</option>
-                                                            {% endif %}
-                                                        </select>
-                                                    </form>
+                                                    {% if current_user.is_super_admin() or (not user.is_admin()) %}
+                                                        <form method="POST" action="{{ url_for('admin.update_user_role', user_id=user.id) }}" class="d-inline">
+                                                            <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                                <option value="client" {% if user.role == 'client' %}selected{% endif %}>Client</option>
+                                                                <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                                                                {% if current_user.is_super_admin() %}
+                                                                    <option value="super_admin" {% if user.role == 'super_admin' %}selected{% endif %}>Super Admin</option>
+                                                                {% endif %}
+                                                            </select>
+                                                        </form>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">Admin</span>
+                                                    {% endif %}
                                                     
                                                     <!-- Delete Button -->
                                                     {% if current_user.is_super_admin() or (not user.is_admin()) %}
