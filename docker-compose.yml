@@ -24,7 +24,7 @@ services:
       - ./app/static/uploads:/app/app/static/uploads:rw
     security_opt:
       - no-new-privileges:true
- 
+
 
   mongo:
     image: mongo:7.0
@@ -36,7 +36,7 @@ services:
     volumes:
       - mongo_data:/data/db
     restart: unless-stopped
-  
+
 
 volumes:
   mongo_data:
