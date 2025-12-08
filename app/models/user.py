@@ -16,7 +16,10 @@ class User(UserMixin):
         return self.is_active_user
     
     def is_admin(self):
-        return self.role == 'admin'
+        return self.role in ['admin', 'super_admin']
+    
+    def is_super_admin(self):
+        return self.role == 'super_admin'
     
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)

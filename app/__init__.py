@@ -12,14 +12,15 @@ def create_app():
     
     mongo.init_app(app)
     
-    # Test MongoDB connection
+    # Test MongoDB connection (non-blocking)
     with app.app_context():
         try:
             mongo.db.command('ping')
             print(f"✓ Connected to MongoDB: {app.config['MONGO_URI']}")
         except Exception as e:
-            print(f"✗ MongoDB connection failed: {e}")
+            print(f"⚠ MongoDB connection failed (will retry): {e}")
             print(f"MongoDB URI: {app.config['MONGO_URI']}")
+            # Don't fail, let the app start and retry connections later
     
     # Initialize Flask-Login
     login_manager.init_app(app)

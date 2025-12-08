@@ -2,41 +2,41 @@ version: '3.8'
 
 services:
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: book_library_web
     ports:
-      - "5001:5000"
+      - "5001:5001"
     environment:
-      - MONGO_URI=mongodb://mongo:27017/book_library
-      - SECRET_KEY=your-production-secret-key-change-this
-      - FLASK_ENV=production
+      FLASK_ENV: production
+      PORT: 5001
+      MONGO_URI: mongodb://mongo:27017/book_library
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY not set}
     depends_on:
       mongo:
         condition: service_started
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
     volumes:
-      - ./app/static/uploads:/app/app/static/uploads
-    networks:
-      - app-network
+      - ./app/static/uploads:/app/app/static/uploads:rw
+    security_opt:
+      - no-new-privileges:true
+
 
   mongo:
     image: mongo:7.0
+    container_name: book_library_db
     ports:
       - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: book_library
     volumes:
       - mongo_data:/data/db
     restart: unless-stopped
-    networks:
-      - app-network
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
+
 
 volumes:
   mongo_data:
-
-networks:
-  app-network:
-    driver: bridge
