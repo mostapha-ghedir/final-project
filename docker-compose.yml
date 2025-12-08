@@ -1,3 +1,4 @@
+version: '3.8'  # أضف هذا السطر في الأعلى
 
 services:
   web:
@@ -5,58 +6,41 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: book_library_web
-
     ports:
       - "5001:5001"
-
     environment:
       FLASK_ENV: production
       PORT: 5001
       MONGO_URI: mongodb://mongo:27017/book_library
       SECRET_KEY: ${SECRET_KEY:?SECRET_KEY not set}
-
     depends_on:
       mongo:
         condition: service_started
-
     restart: unless-stopped
-
-    # حماية ضد الكتابة العشوائية داخل الحاوية
     read_only: true
     tmpfs:
       - /tmp
-
-    # المجلد الوحيد الذي يحتاج الكتابة
     volumes:
       - ./app/static/uploads:/app/app/static/uploads:rw
-
-    # تعزيز الأمن
     security_opt:
       - no-new-privileges:true
-
-    # الحد من صلاحيات الشبكة و الـ system calls (اختياري)
-    cap_drop:
-      - ALL
-
+    # أزل cap_drop من هنا أو احتفظ به (اختياري للتطبيق)
+    # cap_drop:
+    #   - ALL
 
   mongo:
     image: mongo:7.0
     container_name: book_library_db
-
     ports:
       - "27017:27017"
-
     environment:
       MONGO_INITDB_DATABASE: book_library
-
     volumes:
       - mongo_data:/data/db
-
     restart: unless-stopped
-
-    # أمان إضافي
-    cap_drop:
-      - ALL
+    # أزل هذا السطر - MongoDB يحتاج capabilities معينة
+    # cap_drop:
+    #   - ALL
 
 volumes:
   mongo_data:
