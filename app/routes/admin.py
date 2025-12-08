@@ -50,8 +50,23 @@ def manage_users():
 @login_required
 @admin_required
 def update_user_role(user_id):
+    target_user = User.get_by_id(user_id)
+    if not target_user:
+        flash('User not found', 'error')
+        return redirect(url_for('admin.manage_users'))
+    
+    # Only super admin can change admin roles
+    if target_user.is_admin() and not current_user.is_super_admin():
+        flash('Only super admin can change admin roles', 'error')
+        return redirect(url_for('admin.manage_users'))
+    
     new_role = request.form['role']
-    if new_role in ['admin', 'client']:
+    if new_role in ['admin', 'client', 'super_admin']:
+        # Only super admin can assign super_admin role
+        if new_role == 'super_admin' and not current_user.is_super_admin():
+            flash('Only super admin can assign super admin role', 'error')
+            return redirect(url_for('admin.manage_users'))
+        
         User.update_role(user_id, new_role)
         flash('User role updated successfully', 'success')
     else:
@@ -64,9 +79,20 @@ def update_user_role(user_id):
 def delete_user(user_id):
     if user_id == current_user.id:
         flash('Cannot delete your own account', 'error')
-    else:
-        User.delete(user_id)
-        flash('User deleted successfully', 'success')
+        return redirect(url_for('admin.manage_users'))
+    
+    target_user = User.get_by_id(user_id)
+    if not target_user:
+        flash('User not found', 'error')
+        return redirect(url_for('admin.manage_users'))
+    
+    # Only super admin can delete admins
+    if target_user.is_admin() and not current_user.is_super_admin():
+        flash('Only super admin can delete admin users', 'error')
+        return redirect(url_for('admin.manage_users'))
+    
+    User.delete(user_id)
+    flash('User deleted successfully', 'success')
     return redirect(url_for('admin.manage_users'))
 
 @bp.route('/api/stats')
