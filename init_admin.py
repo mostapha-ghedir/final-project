@@ -7,6 +7,7 @@ Run this script once to create the first admin user.
 from app import create_app
 from app.models.user import User
 
+
 def create_admin_user():
     app = create_app()
     
