@@ -25,12 +25,10 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # -----------------------------
 # 5. Copy Application Code
 # -----------------------------
-# نسخ run.py أولًا لأنه خارج app
 COPY run.py .
-# نسخ مجلد app كامل
+
 COPY app ./app
 
-# Ensure uploads directory exists
 RUN mkdir -p app/static/uploads
 
 # -----------------------------
