@@ -7,6 +7,7 @@ Run this script once to create the first admin user.
 from app import create_app
 from app.models.user import User
 
+
 def create_admin_user():
     app = create_app()
     
@@ -17,12 +18,12 @@ def create_admin_user():
             print("Admin user already exists!")
             return
         
-        # Create admin user
+        # Create super admin user
         admin_user = User.create(
             username='admin',
             email='admin@booklibrary.com',
             password='admin123',  # Change this password!
-            role='admin'
+            role='super_admin'
         )
         
         print("Admin user created successfully!")
@@ -33,3 +34,4 @@ def create_admin_user():
 
 if __name__ == '__main__':
     create_admin_user()
+    
